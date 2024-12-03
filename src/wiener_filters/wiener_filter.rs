@@ -1,12 +1,17 @@
 use nalgebra::{DVector, DMatrix};
 
-/// A static sized wiener filter
-/// 
+/// A Weiner filter implementation.
+/// See <a href="https://en.wikipedia.org/wiki/Wiener_filter" target="_blank">wikipedia</a> for more information.
 pub struct WeinerFilter {
     coefficients: Vec<f64>,
 }
 
 impl WeinerFilter {
+    /// Creates a new Weiner filter
+    /// # Arguments
+    /// * `observed_signals` - A vector of observed signals with the same length that are used to predict the desired signal
+    /// * `desired_signal` - A desired signal with the same length as the observed signals
+    /// ## **Note that the observed signals and the desired signal must be the same length or unexpected behavior will occur
     pub fn new(observed_signals: &Vec<&[f64]>, desired_signal: &[f64]) -> Self {
         let len = observed_signals[0].len();
         let mut correlation_matrix = DMatrix::<f64>::zeros(observed_signals.len(), observed_signals.len());
@@ -44,6 +49,12 @@ impl WeinerFilter {
         }
     }
 
+    /// Filters the observed signals
+    /// # Arguments
+    /// * `observed_signals` - A vector of observed signals of the same length
+    /// ## **Note that the observed signals must be the same length or unexpected behavior will occur
+    /// # Returns
+    /// A filtered signal with the same length as the observed signals
     pub fn filter(&self, observed_signals: &Vec<&[f64]>) -> Vec<f64> {
         let mut filtered = Vec::with_capacity(observed_signals.len());
         for i in 0..observed_signals[0].len() {
@@ -54,6 +65,11 @@ impl WeinerFilter {
             filtered.push(sum);
         }
         filtered
+    }
+
+    /// Returns the coefficients of the Weiner filter
+    pub fn coefficients(&self) -> &Vec<f64> {
+        &self.coefficients
     }
 }
 
